@@ -2,6 +2,7 @@
 
 Spree::Core::Engine.routes.draw do
   namespace :admin do
-    resources :stores
+    resources :stores, only: [:index]
+    resources :orders, only: [:index]
   end
 end

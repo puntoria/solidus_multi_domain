@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe Spree::Admin::StoresController do
+describe Spree::Admin::OrdersController do
   stub_authorization!
 
   describe "#index" do

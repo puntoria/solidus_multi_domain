@@ -10,13 +10,11 @@ module SolidusMultiDomain
 
     engine_name 'solidus_multi_domain'
 
-    # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
     end
 
     def self.activate
-      ::Spree::Config.searcher_class = ::Spree::Search::MultiDomain
       ApplicationController.include SolidusMultiDomain::MultiDomainHelpers
     end
 
