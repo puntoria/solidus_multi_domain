@@ -5,49 +5,38 @@ require "spec_helper"
 describe Spree::Admin::StoresController do
   stub_authorization!
 
-  describe "#index" do
-    render_views
+  describe "#create" do
+    let(:user) { create(:user) }
+    let(:current_api_user) { user }
 
-    it "renders" do
-      get :index
-      expect(response).to be_successful
+    let(:store_params) do
+      {
+        name: "New Store",
+        url: "http://new-store.example.com",
+        mail_from_address: "hello@new-store.example.com",
+        code: "new_store",
+        default_currency: "EUR"
+      }
     end
 
-    context "when the user can manage all stores" do
-      stub_authorization! do |_user|
-        can :manage, Spree::Store
-      end
-
-      it "assigns a list of all stores as @stores" do
-        get :index
-        expect(assigns(:stores)).to eq(Spree::Store.all)
-      end
+    before do
+      allow(controller).to receive_messages spree_current_user: user
     end
 
-    context "when user cannot manage some stores" do
-      stub_authorization! do |_store|
-        can :manage, Spree::Store
-        cannot :manage, Spree::Store, code: 'inaccessible'
-      end
-
-      it "assigns a list of accessible stores as @stores" do
-        store = create(:store)
-        create(:store, code: 'inaccessible')
-
-        get :index
-        expect(assigns(:stores)).to eq [store]
-      end
+    it "creates a new store" do
+      expect {
+        post :create, params: { store: store_params }
+      }.to change(Spree::Store, :count).by(1)
     end
-  end
 
-  describe "#edit" do
-    render_views
+    it "redirects to the stores index" do
+      post :create, params: { store: store_params }
+      expect(response).to redirect_to(admin_stores_path)
+    end
 
-    let(:store) { create(:store) }
-
-    it "renders" do
-      get :edit, params: { id: store.to_param }
-      expect(response).to be_successful
+    it "associates the current user with the store" do
+      post :create, params: { store: store_params }
+      expect(Spree::Store.last.users.first).to eq(user)
     end
   end
 end

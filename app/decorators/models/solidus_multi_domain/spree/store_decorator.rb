@@ -24,6 +24,7 @@ module SolidusMultiDomain
 
           validates_attachment_file_name :logo, matches: [/png\Z/i, /jpe?g\Z/i],
                                                 if: -> { respond_to?(:logo_file_name) }
+
         end
       end
 
